@@ -1,0 +1,29 @@
+name: Create Pull Request to Dev
+
+on:
+  push:
+    branches:
+      - '**' # Trigger on push to any branch
+
+jobs:
+  create-pull-request:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v2
+
+      - name: Set up GitHub CLI
+        run: |
+          sudo apt-get update
+          sudo apt-get install gh
+
+      - name: Authenticate GitHub CLI
+        run: gh auth login --with-token < ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create a Pull Request to dev
+        run: |
+          BRANCH_NAME=${GITHUB_REF#refs/heads/}
+          gh pr create --base dev --head $BRANCH_NAME --title "Merge $BRANCH_NAME into dev" --body "This is an automatically created PR from branch $BRANCH_NAME to dev."
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
