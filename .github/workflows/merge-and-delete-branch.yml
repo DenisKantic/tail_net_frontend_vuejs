@@ -1,0 +1,32 @@
+name: Merge and Delete Branch
+
+on:
+  push:
+    branches:
+      - '**' # This will trigger on push to any branch
+
+jobs:
+  merge-and-delete:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout dev branch
+        uses: actions/checkout@v2
+        with:
+          ref: dev
+
+      - name: Fetch all branches
+        run: git fetch --all
+
+      - name: Merge the pushed branch into dev
+        run: |
+          BRANCH_NAME=${GITHUB_REF#refs/heads/}
+          git checkout dev
+          git merge --no-ff "$BRANCH_NAME" --no-commit || echo "Merge conflict detected"
+
+      - name: Delete branch after successful merge
+        if: success() && !contains(github.ref, 'refs/heads/dev')
+        run: |
+          BRANCH_NAME=${GITHUB_REF#refs/heads/}
+          git push origin --delete "$BRANCH_NAME"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
