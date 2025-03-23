@@ -1,11 +1,9 @@
 <template>
-  <v-app>
-    <Navigation />
-  </v-app>
+  <Navigation />
 </template>
 
 <script lang="ts">
-import Navigation from '@/views/navigation_bar/navigation_bar.vue'
+import Navigation from '../../components/navigation_bar/navigation_bar.vue'
 
 export default {
   components: {
